@@ -1,0 +1,87 @@
+metadata:
+  currency: INR
+  status: illustrative
+  source: "PLACEHOLDER: replace with dated local vendor quotes before procurement use"
+  date: null
+
+materials:
+  aluminium_6061:
+    label: Aluminium 6061
+    density_kg_cm3: 0.0027
+    price_kg: 320
+    mrr_cm3_min: 20
+    min_wall_mm: 1.0
+    processes: [CNC milling, CNC turning, Sheet metal]
+  mild_steel:
+    label: Mild steel
+    density_kg_cm3: 0.00785
+    price_kg: 75
+    mrr_cm3_min: 8
+    min_wall_mm: 1.5
+    processes: [CNC milling, CNC turning, Sheet metal, Sand casting]
+  stainless_304:
+    label: Stainless steel 304
+    density_kg_cm3: 0.008
+    price_kg: 240
+    mrr_cm3_min: 4
+    min_wall_mm: 1.5
+    processes: [CNC milling, CNC turning, Sheet metal]
+  brass:
+    label: Brass
+    density_kg_cm3: 0.0085
+    price_kg: 550
+    mrr_cm3_min: 16
+    min_wall_mm: 1.0
+    processes: [CNC milling, CNC turning]
+  aluminium_a356:
+    label: Aluminium A356 (cast)
+    density_kg_cm3: 0.00268
+    price_kg: 260
+    mrr_cm3_min: 18
+    min_wall_mm: 3.0
+    processes: [Sand casting]
+  aluminium_adc12:
+    label: Aluminium ADC12 (die cast)
+    density_kg_cm3: 0.00274
+    price_kg: 250
+    mrr_cm3_min: 18
+    min_wall_mm: 1.5
+    processes: [Die casting]
+
+machining:
+  stock_factor: 1.15
+  scrap_allowance: 0.05
+  noncutting_factor: 0.20
+  handling_min: 1.0
+  tooling_fraction: 0.06
+  milling: {hour_rate: 900, setup_hours: 1.5, programming: 1200}
+  turning: {hour_rate: 750, setup_hours: 1.0, programming: 800}
+
+sheet:
+  utilisation: 0.75
+  laser_hour_rate: 1200
+  laser_speed_mm_min: 1800
+  speed_reference_thickness_mm: 2.0
+  pierce_seconds: 2.0
+  bend_cost: 12
+  setup_hours: 0.5
+  programming: 500
+  tooling_per_batch: 200
+
+casting:
+  sand: {yield: 0.60, tooling_per_batch: 18000, setup_per_batch: 1500,
+         conversion_per_kg: 55, fettling_per_kg: 18, cycle_min: 3.0}
+  die: {yield: 0.85, tooling_per_batch: 250000, setup_per_batch: 5000,
+        conversion_per_kg: 28, fettling_per_kg: 8, cycle_min: 0.75}
+
+inspection: {hour_rate: 300, minutes_per_part: 1.0}
+finishing:
+  anodize: {label: Anodising, basis: dm2, rate: 12, minimum_lot: 600,
+            materials: [aluminium_6061, aluminium_a356, aluminium_adc12]}
+  heat_treat: {label: Heat treatment, basis: kg, rate: 45, minimum_lot: 800,
+               materials: [mild_steel, brass, aluminium_6061, aluminium_a356]}
+  powder_coat: {label: Powder coating, basis: dm2, rate: 8, minimum_lot: 500,
+                materials: [aluminium_6061, mild_steel, stainless_304, aluminium_a356,
+                            aluminium_adc12]}
+  plating: {label: Plating, basis: dm2, rate: 15, minimum_lot: 750,
+            materials: [mild_steel, stainless_304, brass]}
