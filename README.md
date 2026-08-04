@@ -10,7 +10,7 @@ python -m venv .venv
 .venv\Scripts\python -m streamlit run app.py
 ```
 
-The calculation engine supports milling and turning with rectangular and cylindrical stock.
+The calculation engine supports milling, turning, sheet metal, sand casting and die casting.
 Rates in `config/rates.yaml` are illustrative, not vendor quotes. Dimensions use mm,
 volume uses cm3, mass uses kg, and all costs use INR.
 
@@ -22,3 +22,7 @@ time. Setup and programming are amortised across the batch. Tooling is a fractio
 machine cost. Finishing respects minimum lot charges.
 
 Overhead applies to direct costs; the margin input is a markup on cost plus overhead.
+Sheet metal uses the flat blank, thickness-adjusted laser speed, pierces and bend charges.
+Casting uses metal yield, weight-based conversion and batch-amortised pattern or die cost.
+Process comparisons need an engineering review: a different process may require a different
+geometry, material grade, stock shape or secondary operation.
