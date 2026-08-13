@@ -26,3 +26,10 @@ Sheet metal uses the flat blank, thickness-adjusted laser speed, pierces and ben
 Casting uses metal yield, weight-based conversion and batch-amortised pattern or die cost.
 Process comparisons need an engineering review: a different process may require a different
 geometry, material grade, stock shape or secondary operation.
+
+## Manufacturability screening
+
+`config/dfm_thresholds.yaml` controls wall, radius, pocket, drilling, tolerance,
+bend-clearance, draft and finish checks. Defaults are heuristics for review with a
+shop, not handbook-certified limits. The reference links explain the risks; they
+do not validate every numerical default. A clean screening result is not a DFM approval.

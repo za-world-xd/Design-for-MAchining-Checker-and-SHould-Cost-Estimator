@@ -1,0 +1,24 @@
+# Screening assumptions, not a manufacturing standard or a shop capability guarantee.
+# Review every threshold with the shop responsible for the part.
+metadata:
+  status: heuristic
+  references:
+    - https://www.protolabs.com/services/cnc-machining/cnc-milling/design-guidelines/
+    - https://www.protolabs.com/resources/design-tips/mastering-complex-features-on-machined-parts/
+  note: References explain the risks; numerical defaults below are editable screening assumptions.
+max_pocket_ratio: 4.0
+min_cutter_radius_mm: 1.0
+max_hole_ratio: 5.0
+max_turning_ratio: 4.0
+min_tolerance_it: 7
+min_bend_radius_factor: 1.0
+min_hole_edge_factor: 2.0
+min_hole_bend_factor: 2.5
+max_cast_wall_ratio: 2.0
+min_draft_deg: 1.0
+minimum_ra:
+  CNC milling: 3.2
+  CNC turning: 1.6
+  Sheet metal: 6.3
+  Sand casting: 12.5
+  Die casting: 3.2
