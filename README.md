@@ -33,3 +33,6 @@ geometry, material grade, stock shape or secondary operation.
 bend-clearance, draft and finish checks. Defaults are heuristics for review with a
 shop, not handbook-certified limits. The reference links explain the risks; they
 do not validate every numerical default. A clean screening result is not a DFM approval.
+
+PDF exports include cost, findings, assumptions, geometry and a rate/threshold snapshot.
+They use INR text so the currency renders with standard PDF fonts.
