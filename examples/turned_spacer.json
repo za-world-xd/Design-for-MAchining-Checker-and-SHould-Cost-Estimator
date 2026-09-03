@@ -1,0 +1,14 @@
+{
+  "name": "Turned spacer (illustrative)",
+  "process": "CNC turning",
+  "material": "aluminium_6061",
+  "quantity": 100,
+  "length_mm": 100,
+  "width_mm": 20,
+  "height_mm": 20,
+  "volume_cm3": 20,
+  "wall_mm": 3,
+  "max_wall_mm": 3,
+  "finish_ra_um": 1.6,
+  "supported": true
+}

@@ -10,7 +10,7 @@ python -m venv .venv
 .venv\Scripts\python -m streamlit run app.py
 ```
 
-The calculation engine supports milling, turning, sheet metal, sand casting and die casting.
+The Streamlit worksheet supports milling, turning, sheet metal, sand casting and die casting.
 Rates in `config/rates.yaml` are illustrative, not vendor quotes. Dimensions use mm,
 volume uses cm3, mass uses kg, and all costs use INR.
 
@@ -36,3 +36,13 @@ do not validate every numerical default. A clean screening result is not a DFM a
 
 PDF exports include cost, findings, assumptions, geometry and a rate/threshold snapshot.
 They use INR text so the currency renders with standard PDF fonts.
+
+## Workflow
+
+Choose a starting example, process and material, edit the part form, then calculate.
+Inspect the cost table, DFM findings and batch-size chart. PDF, cost CSV and audit JSON
+downloads refer to the last submitted snapshot. Form edits need a new calculation.
+Changing example, process or material clears the previous estimate.
+
+STEP parsing and automatic feature recognition are not implemented. The form is the
+primary input; use CAD measurements for solid volume and finishing surface area.
