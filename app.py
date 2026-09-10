@@ -218,6 +218,37 @@ with st.expander("Assumptions and rate basis"):
     st.caption("STEP import and automatic feature recognition are not implemented. "
                "Use measured geometry in the form. No files are uploaded to a remote service.")
 
+st.subheader("Compare an alternative")
+st.caption("Comparison holds the submitted dimensions, volume, finish and quantity fixed. "
+           "A process change may need a redesigned part or additional operations.")
+cols = st.columns(2)
+alternative_process = cols[0].selectbox("Alternative process", list(Process),
+                                        index=list(Process).index(part.process),
+                                        format_func=lambda p: p.value)
+alternative_materials = [key for key, item in saved_rates.materials.items()
+                         if alternative_process in item.processes]
+alternative_material = cols[1].selectbox("Alternative material", alternative_materials,
+                                         format_func=lambda key: saved_rates.materials[key].label)
+try:
+    alternative_part = with_changes(part, process=alternative_process, material=alternative_material)
+    alternative = estimate(alternative_part, saved_rates)
+    comparison = pd.DataFrame({
+        "Component": list(result.costs) + [key for key in alternative.costs if key not in result.costs],
+    })
+    comparison["Submitted (INR)"] = comparison["Component"].map(result.costs).fillna(0)
+    comparison["Alternative (INR)"] = comparison["Component"].map(alternative.costs).fillna(0)
+    st.dataframe(comparison, hide_index=True, width="stretch")
+    delta = alternative.unit_cost - result.unit_cost
+    st.write(f"Submitted ₹{result.unit_cost:,.2f}/unit; alternative ₹{alternative.unit_cost:,.2f}/unit. "
+             f"Difference: ₹{delta:+,.2f} ({delta / result.unit_cost:+.1%}).")
+    alternative_findings = check_dfm(alternative_part, saved_rates, saved_thresholds)
+    st.caption(f"Alternative screening: {len(alternative_findings)} finding(s). "
+               "Exports below contain the submitted estimate only.")
+    for finding in alternative_findings:
+        st.write(f"{finding.severity.capitalize()}: {finding.message} {finding.suggestion}")
+except (ValidationError, ValueError) as exc:
+    st.warning(f"This alternative cannot use the submitted geometry or finish: {exc}")
+
 st.subheader("Export submitted estimate")
 cols = st.columns(3)
 cols[0].download_button("Download PDF report", pdf, file_name="dfm-estimate.pdf",

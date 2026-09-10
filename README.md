@@ -43,6 +43,8 @@ Choose a starting example, process and material, edit the part form, then calcul
 Inspect the cost table, DFM findings and batch-size chart. PDF, cost CSV and audit JSON
 downloads refer to the last submitted snapshot. Form edits need a new calculation.
 Changing example, process or material clears the previous estimate.
+An alternative material/process table compares the same submitted envelope and volume.
+Unsupported material, geometry and finishing combinations show a validation message.
 
 STEP parsing and automatic feature recognition are not implemented. The form is the
 primary input; use CAD measurements for solid volume and finishing surface area.
