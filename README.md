@@ -48,3 +48,17 @@ Unsupported material, geometry and finishing combinations show a validation mess
 
 STEP parsing and automatic feature recognition are not implemented. The form is the
 primary input; use CAD measurements for solid volume and finishing surface area.
+
+## Check the calculations
+
+```powershell
+.venv\Scripts\python -m pytest -q
+.venv\Scripts\ruff check .
+```
+
+Three illustrative parts in `examples/` have independent component calculations in
+`examples/hand_calculations.csv`. Tests compare every component with these values.
+The milling example uses 138 cm3 stock, 78 cm3 removal and a 5.68 minute cycle.
+The turning example uses cylindrical stock of 36.1283155 cm3. The sheet example
+uses a 12 cm3 blank, 75% nesting utilisation, 320 mm cut and two bends.
+Vendor quote validation is pending. No accuracy claim is made against real quotes.

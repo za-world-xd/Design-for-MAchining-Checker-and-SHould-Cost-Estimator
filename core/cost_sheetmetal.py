@@ -23,11 +23,17 @@ def estimate_sheetmetal(part: Part, rates: Rates):
         "Setup": (cfg.setup_hours * cfg.laser_hour_rate + cfg.programming) / part.quantity,
         "Tooling": cfg.tooling_per_batch / part.quantity,
     }
-    return assemble(part, rates, direct, part.net_volume_cm3 * material.density_kg_cm3,
-                    cycle, [
-                        "Length and width describe the developed flat blank; height is thickness.",
-                        f"Nesting utilisation is {cfg.utilisation:.0%}; no scrap resale credit.",
-                        "Laser speed scales inversely with thickness above the reference gauge.",
-                        "Cut perimeter defaults to the outer rectangle; enter internal cuts explicitly.",
-                        "Cycle time includes laser cutting and pierces only; bends use a flat rate.",
-                    ])
+    return assemble(
+        part,
+        rates,
+        direct,
+        part.net_volume_cm3 * material.density_kg_cm3,
+        cycle,
+        [
+            "Length and width describe the developed flat blank; height is thickness.",
+            f"Nesting utilisation is {cfg.utilisation:.0%}; no scrap resale credit.",
+            "Laser speed scales inversely with thickness above the reference gauge.",
+            "Cut perimeter defaults to the outer rectangle; enter internal cuts explicitly.",
+            "Cycle time includes laser cutting and pierces only; bends use a flat rate.",
+        ],
+    )

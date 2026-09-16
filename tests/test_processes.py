@@ -18,17 +18,21 @@ def test_sheet_hand_calculation():
     assert result.unit_cost == pytest.approx(75.9584711111)
 
 
-@pytest.mark.parametrize("process,material,yield_fraction,tooling", [
-    (Process.SAND, "aluminium_a356", .6, 18000),
-    (Process.DIE, "aluminium_adc12", .85, 250000),
-])
+@pytest.mark.parametrize(
+    "process,material,yield_fraction,tooling",
+    [
+        (Process.SAND, "aluminium_a356", 0.6, 18000),
+        (Process.DIE, "aluminium_adc12", 0.85, 250000),
+    ],
+)
 def test_casting_material_yield_and_tooling(process, material, yield_fraction, tooling):
     part = Part(process=process, material=material, volume_cm3=60, quantity=100)
     rates = load_rates()
     result = estimate_casting(part, rates)
     mass = 60 * rates.materials[material].density_kg_cm3
     assert result.costs["Material"] == pytest.approx(
-        mass / yield_fraction * rates.materials[material].price_kg)
+        mass / yield_fraction * rates.materials[material].price_kg
+    )
     assert result.costs["Tooling"] == tooling / 100
 
 
@@ -37,18 +41,23 @@ def test_incompatible_material_process():
         estimate(Part(process=Process.DIE, material="aluminium_6061"), load_rates())
 
 
-@pytest.mark.parametrize("process,material", [
-    (Process.MILLING, "aluminium_6061"), (Process.TURNING, "mild_steel"),
-    (Process.SHEET, "mild_steel"), (Process.SAND, "aluminium_a356"),
-    (Process.DIE, "aluminium_adc12"),
-])
+@pytest.mark.parametrize(
+    "process,material",
+    [
+        (Process.MILLING, "aluminium_6061"),
+        (Process.TURNING, "mild_steel"),
+        (Process.SHEET, "mild_steel"),
+        (Process.SAND, "aluminium_a356"),
+        (Process.DIE, "aluminium_adc12"),
+    ],
+)
 def test_all_processes_positive_and_batch_monotonic(process, material):
     part = Part(process=process, material=material)
     rates = load_rates()
     result = estimate(part, rates)
     assert all(value >= 0 for value in result.costs.values())
     values = [row["Unit cost (INR)"] for row in batch_sensitivity(part, rates)]
-    assert all(a >= b for a, b in zip(values, values[1:]))
+    assert all(a >= b for a, b in zip(values, values[1:], strict=False))
     assert result.batch_cost == result.unit_cost * part.quantity
 
 

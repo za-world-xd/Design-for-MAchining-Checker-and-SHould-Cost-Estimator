@@ -22,16 +22,21 @@ def machining_cost(part, rates, machine):
     cycle = removed / material.mrr_cm3_min * (1 + cfg.noncutting_factor) + cfg.handling_min
     machining = cycle / 60 * machine.hour_rate
     direct = {
-        "Material": stock * material.density_kg_cm3 * material.price_kg
-        * (1 + cfg.scrap_allowance),
+        "Material": stock * material.density_kg_cm3 * material.price_kg * (1 + cfg.scrap_allowance),
         "Machining": machining,
         "Setup": (machine.setup_hours * machine.hour_rate + machine.programming) / part.quantity,
         "Tooling": machining * cfg.tooling_fraction,
     }
-    return assemble(part, rates, direct, part.net_volume_cm3 * material.density_kg_cm3,
-                    cycle, [
-                        f"Stock volume {stock:.3f} cm3; removed volume {removed:.3f} cm3.",
-                        "Stock allowance is a volume multiplier, not an allowance on each axis.",
-                        "MRR is a single effective removal rate; holes and toolpaths are not timed.",
-                        "Setup includes programming; tooling is a fraction of machine cost.",
-                    ])
+    return assemble(
+        part,
+        rates,
+        direct,
+        part.net_volume_cm3 * material.density_kg_cm3,
+        cycle,
+        [
+            f"Stock volume {stock:.3f} cm3; removed volume {removed:.3f} cm3.",
+            "Stock allowance is a volume multiplier, not an allowance on each axis.",
+            "MRR is a single effective removal rate; holes and toolpaths are not timed.",
+            "Setup includes programming; tooling is a fraction of machine cost.",
+        ],
+    )

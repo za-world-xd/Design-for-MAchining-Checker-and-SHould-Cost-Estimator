@@ -31,8 +31,12 @@ def assemble(part, rates, direct, mass_kg, cycle_min, assumptions) -> Estimate:
     direct["Overhead"] = sum(direct.values()) * part.overhead_pct / 100
     direct["Margin (markup)"] = sum(direct.values()) * part.margin_pct / 100
     return Estimate(
-        part=part, costs=direct, mass_kg=mass_kg, cycle_min=cycle_min,
-        assumptions=assumptions + [
+        part=part,
+        costs=direct,
+        mass_kg=mass_kg,
+        cycle_min=cycle_min,
+        assumptions=assumptions
+        + [
             "Finishing uses envelope surface area unless measured area is supplied.",
             "Margin is a markup on direct cost plus overhead, not a gross margin.",
             "DFM warnings do not automatically change costs; model extra operations explicitly.",

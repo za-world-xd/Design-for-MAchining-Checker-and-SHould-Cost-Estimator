@@ -48,11 +48,18 @@ def test_harder_material_takes_longer():
     )
 
 
-@pytest.mark.parametrize("changes", [
-    {"quantity": 0}, {"length_mm": -1}, {"volume_cm3": 121},
-    {"finish_ra_um": float("nan")}, {"wall_mm": 4, "max_wall_mm": 3},
-    {"name": " "}, {"secondary": ["anodize", "anodize"]},
-])
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"quantity": 0},
+        {"length_mm": -1},
+        {"volume_cm3": 121},
+        {"finish_ra_um": float("nan")},
+        {"wall_mm": 4, "max_wall_mm": 3},
+        {"name": " "},
+        {"secondary": ["anodize", "anodize"]},
+    ],
+)
 def test_invalid_geometry(changes):
     with pytest.raises(ValidationError):
         Part(**changes)
@@ -60,8 +67,11 @@ def test_invalid_geometry(changes):
 
 def test_unknown_material_and_finish_rejected():
     rates = load_rates()
-    for part in [Part(material="unknown"), Part(secondary=["unknown"]),
-                 Part(material="mild_steel", secondary=["anodize"])]:
+    for part in [
+        Part(material="unknown"),
+        Part(secondary=["unknown"]),
+        Part(material="mild_steel", secondary=["anodize"]),
+    ]:
         with pytest.raises(ValueError):
             estimate_milling(part, rates)
 
@@ -70,5 +80,5 @@ def test_minimum_finish_lot_and_markup_base():
     result = estimate_milling(Part(secondary=["anodize"], quantity=10), load_rates())
     assert result.costs["Finishing"] == 60
     direct = sum(v for k, v in result.costs.items() if k not in ["Overhead", "Margin (markup)"])
-    assert result.costs["Overhead"] == pytest.approx(direct * .15)
-    assert result.costs["Margin (markup)"] == pytest.approx(direct * 1.15 * .10)
+    assert result.costs["Overhead"] == pytest.approx(direct * 0.15)
+    assert result.costs["Margin (markup)"] == pytest.approx(direct * 1.15 * 0.10)

@@ -26,6 +26,9 @@ def with_changes(part: Part, **changes) -> Part:
 def batch_sensitivity(part: Part, rates: Rates, quantities=None) -> list[dict]:
     quantities = quantities if quantities is not None else [1, 10, 25, 50, 100, 250, 500, 1000]
     return [
-        {"Quantity": qty, "Unit cost (INR)": estimate(with_changes(part, quantity=qty), rates).unit_cost}
+        {
+            "Quantity": qty,
+            "Unit cost (INR)": estimate(with_changes(part, quantity=qty), rates).unit_cost,
+        }
         for qty in sorted(set([*quantities, part.quantity]))
     ]

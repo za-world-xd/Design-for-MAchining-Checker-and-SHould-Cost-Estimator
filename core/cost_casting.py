@@ -22,10 +22,17 @@ def estimate_casting(part: Part, rates: Rates):
         "Setup": cfg.setup_per_batch / part.quantity,
         "Tooling": cfg.tooling_per_batch / part.quantity,
     }
-    return assemble(part, rates, direct, mass, cfg.cycle_min, [
-        f"Metal yield {cfg.yield_fraction:.0%}; gating and riser returns have no resale credit.",
-        "The entire pattern or die cost is amortised over this batch only.",
-        "Casting conversion is charged per kg of net casting mass.",
-        "Cycle time is informational; conversion charges already include processing.",
-        "Post-machining, cores, heat treatment and additional mould cavities are not included.",
-    ])
+    return assemble(
+        part,
+        rates,
+        direct,
+        mass,
+        cfg.cycle_min,
+        [
+            f"Metal yield {cfg.yield_fraction:.0%}; gating and riser returns have no credit.",
+            "The entire pattern or die cost is amortised over this batch only.",
+            "Casting conversion is charged per kg of net casting mass.",
+            "Cycle time is informational; conversion charges already include processing.",
+            "Post-machining, cores, heat treatment and additional mould cavities are not included.",
+        ],
+    )
