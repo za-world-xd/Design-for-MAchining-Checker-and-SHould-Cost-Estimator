@@ -5,6 +5,7 @@ import plotly.express as px
 import streamlit as st
 from pydantic import ValidationError
 
+from core.audit import audit_payload
 from core.config import ROOT, load_rates
 from core.dfm_rules import check_dfm, load_thresholds
 from core.estimator import batch_sensitivity, estimate, with_changes
@@ -224,7 +225,8 @@ if submitted:
             result = estimate(part, rates)
             findings = check_dfm(part, rates, thresholds)
             pdf = build_report(result, findings, rates, thresholds)
-        st.session_state["result"] = (result, findings, pdf, rates, thresholds)
+            audit = audit_payload(result, findings, rates, thresholds)
+        st.session_state["result"] = (result, findings, pdf, rates, thresholds, audit)
     except (ValidationError, ValueError) as exc:
         st.error(f"Check the part inputs: {exc}")
 
@@ -232,7 +234,7 @@ if "result" not in st.session_state:
     st.info("Enter a part above, then calculate to see costs, DFM findings and batch sensitivity.")
     st.stop()
 
-result, findings, pdf, saved_rates, saved_thresholds = st.session_state["result"]
+result, findings, pdf, saved_rates, saved_thresholds, audit = st.session_state["result"]
 part = result.part
 st.divider()
 st.header("Estimate")
@@ -363,13 +365,6 @@ cols[1].download_button(
     file_name="cost-breakdown.csv",
     mime="text/csv",
 )
-audit = {
-    "estimate": result.model_dump(mode="json"),
-    "unit_cost": result.unit_cost,
-    "findings": [finding.model_dump() for finding in findings],
-    "rates": saved_rates.model_dump(mode="json", by_alias=True),
-    "thresholds": saved_thresholds.model_dump(mode="json"),
-}
 cols[2].download_button(
     "Download audit JSON",
     json.dumps(audit, indent=2).encode("utf-8"),

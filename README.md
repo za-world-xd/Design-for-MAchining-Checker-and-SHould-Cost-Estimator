@@ -62,3 +62,14 @@ The milling example uses 138 cm3 stock, 78 cm3 removal and a 5.68 minute cycle.
 The turning example uses cylindrical stock of 36.1283155 cm3. The sheet example
 uses a 12 cm3 blank, 75% nesting utilisation, 320 mm cut and two bends.
 Vendor quote validation is pending. No accuracy claim is made against real quotes.
+
+## Command line
+
+```powershell
+.venv\Scripts\python -m core examples/milled_bracket.json --pdf output/bracket.pdf
+```
+
+The command prints a JSON audit with the submitted geometry, costs, rates and thresholds.
+Use `--rates path/to/rates.yaml` and `--thresholds path/to/thresholds.yaml` for alternate
+cards. JSON input supports multiple hole groups, each with diameter, depth and count.
+The worksheet currently accepts one group of identical holes.
