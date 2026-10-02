@@ -73,3 +73,6 @@ The command prints a JSON audit with the submitted geometry, costs, rates and th
 Use `--rates path/to/rates.yaml` and `--thresholds path/to/thresholds.yaml` for alternate
 cards. JSON input supports multiple hole groups, each with diameter, depth and count.
 The worksheet currently accepts one group of identical holes.
+
+Rate-card validation rejects negative rates and invalid utilisation/yield fractions.
+Mark a card `quoted` only after recording a real source and an ISO quote date.

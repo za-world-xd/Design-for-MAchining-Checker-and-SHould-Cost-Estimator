@@ -59,6 +59,9 @@ process = st.selectbox(
     key=f"process_{starting_point}",
 )
 materials = [key for key, material in rates.materials.items() if process in material.processes]
+if not materials:
+    st.error("This rate card has no material compatible with the selected process.")
+    st.stop()
 material = st.selectbox(
     "Material grade",
     materials,
@@ -67,7 +70,8 @@ material = st.selectbox(
     key=f"material_{starting_point}_{process.value}",
 )
 context = (starting_point, process.value, material)
-if st.session_state.get("context") != context:
+stored_result = st.session_state.get("result")
+if st.session_state.get("context") != context or (stored_result and len(stored_result) != 6):
     st.session_state.pop("result", None)
     st.session_state["context"] = context
 

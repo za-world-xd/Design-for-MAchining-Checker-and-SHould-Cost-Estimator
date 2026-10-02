@@ -1,8 +1,9 @@
+from datetime import date
 from pathlib import Path
 from typing import Annotated, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from core.models import Process
 
@@ -83,20 +84,36 @@ class Inspection(ConfigModel):
 class Metadata(ConfigModel):
     currency: Literal["INR"]
     status: Literal["illustrative", "quoted"]
-    source: str
-    date: str | None
+    source: str = Field(min_length=1)
+    date: date | None
+
+    @model_validator(mode="after")
+    def require_quote_provenance(self):
+        if self.status == "quoted" and (self.date is None or "placeholder" in self.source.lower()):
+            raise ValueError("Quoted rates require a source and quote date")
+        return self
 
 
 class Rates(ConfigModel):
     metadata: Metadata
-    materials: dict[str, Material]
+    materials: dict[str, Material] = Field(min_length=1)
     machining: Machining
     sheet: Sheet
     casting: Casting
     inspection: Inspection
     finishing: dict[str, Finish]
 
+    @model_validator(mode="after")
+    def check_material_references(self):
+        for finish in self.finishing.values():
+            if not set(finish.materials).issubset(self.materials):
+                raise ValueError("Finishing rate references an unknown material")
+        return self
+
 
 def load_rates(path: Path | None = None) -> Rates:
     with (path or ROOT / "config" / "rates.yaml").open(encoding="utf-8") as stream:
-        return Rates.model_validate(yaml.safe_load(stream))
+        try:
+            return Rates.model_validate(yaml.safe_load(stream))
+        except yaml.YAMLError as exc:
+            raise ValueError("Rate card contains invalid YAML") from exc

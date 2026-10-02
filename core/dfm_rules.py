@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import yaml
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from core.config import ROOT, ConfigModel, Positive, Rates
 from core.models import Finding, Part, Process
@@ -21,10 +21,19 @@ class Thresholds(ConfigModel):
     min_draft_deg: Positive
     minimum_ra: dict[Process, Positive]
 
+    @model_validator(mode="after")
+    def require_process_finish_limits(self):
+        if set(self.minimum_ra) != set(Process):
+            raise ValueError("Every process needs a minimum Ra screening threshold")
+        return self
+
 
 def load_thresholds(path: Path | None = None) -> Thresholds:
     with (path or ROOT / "config" / "dfm_thresholds.yaml").open(encoding="utf-8") as stream:
-        return Thresholds.model_validate(yaml.safe_load(stream))
+        try:
+            return Thresholds.model_validate(yaml.safe_load(stream))
+        except yaml.YAMLError as exc:
+            raise ValueError("DFM thresholds contain invalid YAML") from exc
 
 
 def milling_rules(part: Part, cfg: Thresholds) -> list[Finding]:

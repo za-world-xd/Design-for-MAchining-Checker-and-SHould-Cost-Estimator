@@ -43,5 +43,5 @@ def assemble(part, rates, direct, mass_kg, cycle_min, assumptions) -> Estimate:
             "Estimates exclude GST, freight, scrap resale credits and commercial discounts.",
         ],
         rate_source=rates.metadata.source,
-        rate_date=rates.metadata.date or "Undated placeholder",
+        rate_date=str(rates.metadata.date) if rates.metadata.date else "Undated placeholder",
     )
