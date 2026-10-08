@@ -76,3 +76,5 @@ The worksheet currently accepts one group of identical holes.
 
 Rate-card validation rejects negative rates and invalid utilisation/yield fractions.
 Mark a card `quoted` only after recording a real source and an ISO quote date.
+GitHub Actions is configured to run lint and tests on Python 3.11 and 3.13 after pushing.
+Local verification used Windows and Python 3.13; the remote workflow has not run yet.

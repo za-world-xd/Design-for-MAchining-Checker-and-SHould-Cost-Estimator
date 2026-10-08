@@ -126,6 +126,7 @@ with st.form(form_key):
     supported = False
     bends, bend_radius, edge, bend_gap, perimeter, pierces = 0, 3.0, 0.0, 0.0, 0.0, 1
     draft = 2.0
+    clearances_known = False
     holes = []
     if process != Process.SHEET:
         wall = st.number_input("Minimum wall (mm)", min_value=0.01, value=3.0)
@@ -150,15 +151,15 @@ with st.form(form_key):
     elif process == Process.TURNING:
         supported = st.checkbox("Tailstock or steady rest planned", value=sample.supported)
     elif process == Process.SHEET:
+        clearances_known = st.checkbox("Hole clearances are measured", value=False)
+        st.caption("Leave unchecked to omit clearance checks. Measured zero clearance is checked.")
         cols = st.columns(2)
         bends = cols[0].number_input("Bend count", min_value=0, max_value=1000, value=2, step=1)
         bend_radius = cols[1].number_input("Inside bend radius (mm)", min_value=0.0, value=3.0)
         edge = cols[0].number_input(
-            "Hole-edge to blank-edge clearance (mm; 0 unknown)", min_value=0.0, value=0.0
+            "Hole-edge to blank-edge clearance (mm)", min_value=0.0, value=0.0
         )
-        bend_gap = cols[1].number_input(
-            "Hole-edge to bend tangent (mm; 0 unknown)", min_value=0.0, value=0.0
-        )
+        bend_gap = cols[1].number_input("Hole-edge to bend tangent (mm)", min_value=0.0, value=0.0)
         perimeter = cols[0].number_input(
             "Total cut perimeter (mm; 0 uses outer rectangle)", min_value=0.0, value=0.0
         )
@@ -214,8 +215,8 @@ if submitted:
             supported=supported,
             bends=bends,
             bend_radius_mm=bend_radius,
-            hole_edge_mm=edge or None,
-            hole_bend_mm=bend_gap or None,
+            hole_edge_mm=edge if clearances_known else None,
+            hole_bend_mm=bend_gap if clearances_known else None,
             cut_perimeter_mm=perimeter or None,
             pierces=pierces,
             draft_deg=draft,

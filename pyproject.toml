@@ -18,7 +18,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "pypdf>=5,<7", "pymupdf>=1.25,<2"]
-cad = ["cadquery>=2.6,<3"]
 
 [tool.setuptools.packages.find]
 include = ["core*"]

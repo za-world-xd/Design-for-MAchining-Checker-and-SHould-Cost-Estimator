@@ -17,7 +17,7 @@ from reportlab.platypus import (
 
 from core.config import Rates
 from core.dfm_rules import Thresholds
-from core.models import Estimate, Finding
+from core.models import Estimate, Finding, Process
 
 
 def build_report(
@@ -36,8 +36,8 @@ def build_report(
         author="DFM worksheet",
     )
     styles = getSampleStyleSheet()
-    styles["BodyText"].fontSize = 9
-    styles["BodyText"].leading = 12
+    styles["BodyText"].fontSize = 8.5
+    styles["BodyText"].leading = 11
     story = []
 
     def paragraph(text, style="BodyText"):
@@ -53,8 +53,8 @@ def build_report(
                     ("VALIGN", (0, 0), (-1, -1), "TOP"),
                     ("LINEBELOW", (0, 0), (-1, 0), 0.7, colors.HexColor("#52635a")),
                     ("LINEBELOW", (0, 1), (-1, -1), 0.25, colors.HexColor("#d4d9d5")),
-                    ("TOPPADDING", (0, 0), (-1, -1), 5),
-                    ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                    ("TOPPADDING", (0, 0), (-1, -1), 3),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
                 ]
             )
         )
@@ -114,12 +114,18 @@ def build_report(
     ]
     selected_rates = {
         "material": rates.materials[part.material].model_dump(mode="json"),
-        "machining": rates.machining.model_dump(mode="json"),
-        "sheet": rates.sheet.model_dump(mode="json"),
-        "casting": rates.casting.model_dump(mode="json", by_alias=True),
         "inspection": rates.inspection.model_dump(mode="json"),
         "finishing": {k: rates.finishing[k].model_dump(mode="json") for k in part.secondary},
     }
+    if part.process in (Process.MILLING, Process.TURNING):
+        machine_rates = rates.machining.model_dump(mode="json")
+        machine_rates.pop("turning" if part.process == Process.MILLING else "milling")
+        selected_rates["machining"] = machine_rates
+    elif part.process == Process.SHEET:
+        selected_rates["sheet"] = rates.sheet.model_dump(mode="json")
+    else:
+        casting_rates = rates.casting.sand if part.process == Process.SAND else rates.casting.die
+        selected_rates["casting"] = casting_rates.model_dump(mode="json", by_alias=True)
 
     def flattened(data, prefix=""):
         for key, value in data.items():
