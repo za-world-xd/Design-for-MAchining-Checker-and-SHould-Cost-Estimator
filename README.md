@@ -11,7 +11,9 @@ python -m venv .venv
 ```
 
 The Streamlit worksheet supports milling, turning, sheet metal, sand casting and die casting.
-Rates in `config/rates.yaml` are illustrative, not vendor quotes. Dimensions use mm,
+Material prices in `config/rates.yaml` are Indian public-listing budget estimates,
+checked on 5 November 2026. Machine and finishing rates remain illustrative.
+These are not vendor quotes. Dimensions use mm,
 volume uses cm3, mass uses kg, and all costs use INR.
 
 ## Cost basis
@@ -46,8 +48,51 @@ Changing example, process or material clears the previous estimate.
 An alternative material/process table compares the same submitted envelope and volume.
 Unsupported material, geometry and finishing combinations show a validation message.
 
-STEP parsing and automatic feature recognition are not implemented. The form is the
-primary input; use CAD measurements for solid volume and finishing surface area.
+## STEP import
+
+Open **Import a STEP solid**, choose a `.step` or `.stp` file, then click
+**Read and fill geometry**. Review the filled fields and calculate the estimate.
+`examples/step_block.step` is a generated 100 x 60 x 20 mm solid for trying the importer.
+
+The Open CASCADE reader measures a single closed solid's global XYZ bounding box,
+volume and surface area, converting declared file units to mm. Volume and area are
+converted to cm3 and cm2. Files without declared length units are rejected. The original
+filename, SHA-256, unit names and measurements appear in
+the audit JSON and PDF; manual overrides remain visible as the submitted part inputs.
+Re-reading a file fills the geometry again. Replacing or removing it clears the old result.
+
+Milling and casting use X/Y/Z as length/width/height. Turning requires a spindle axis:
+length follows that axis and the initial diameter is the transverse bounding-box
+diagonal, a conservative envelope. Review and replace it with the actual stock diameter.
+Sheet metal requires confirmation that the STEP represents a developed flat blank,
+with thickness along Z. The importer does not unfold folded parts.
+
+Holes, minimum walls, corner radii, draft, tolerances, finish, and secondary operations
+remain manual. Assemblies, multiple solids, open surfaces and non-Part-21 formats are
+rejected. Files are limited to 20 MiB, bounds to 0.01 through 10,000 mm, and reading to
+30 seconds in a separate process. Rotation relative to the global axes can enlarge the
+box. Uploaded bytes stay in the app session; parser temporary files are removed afterward.
+Processing uses the app server, without an external CAD service. Process isolation
+limits parser hangs/crashes; it is not an OS security sandbox.
+
+## Indian material budget rates
+
+| Material | INR/kg used | Listing basis |
+|---|---:|---|
+| Aluminium 6061 | 400 | [Sachin Steel Centre](https://www.sachinsteelcentre.in/aluminium-plate-and-sheet.html), 399/kg plate, rounded |
+| Mild steel | 65 | [Ganpati Steel](https://www.ganpatisteel.com/ms-plate.html), plate |
+| Stainless 304 | 245 | [Narendra Metal](https://www.narendrametalindia.com/stainless-steel-plate.html), plate |
+| Brass | 600 | [Sona Metals](https://sonametals.in/product/brass-round-rod/), 599/kg rod, rounded |
+| Aluminium A356 | 405 | [Ocean Asiatic](https://www.oceanasiatic.co.in/aluminum-ingots.html), alloy ingot |
+| Aluminium ADC12 | 240 | [Ocean Asiatic](https://www.oceanasiatic.co.in/aluminum-ingots.html), alloy ingot |
+
+Lookup date is not the supplier's price-effective date: these listings are undated,
+indicative and may be stale. GST and freight are not stated consistently; the model
+treats these as pre-tax budget rates and excludes GST/freight. Confirm that basis when
+buying. Plate prices are proxies for other stock forms, and listing minimum quantities
+are recorded but not charged as a minimum purchase. Grade, temper, quantity and cut-size
+premiums can change the actual price. Source details are stored per material and exported
+with each report. Machine, tooling, setup and finishing charges still need local calibration.
 
 ## Check the calculations
 
@@ -70,12 +115,16 @@ changing overhead or markup. No accuracy claim is made against real quotes.
 
 ```powershell
 .venv\Scripts\python -m core examples/milled_bracket.json --pdf output/bracket.pdf
+.venv\Scripts\python -m core examples/milled_bracket.json --step examples/step_block.step
 ```
 
 The command prints a JSON audit with the submitted geometry, costs, rates and thresholds.
 Use `--rates path/to/rates.yaml` and `--thresholds path/to/thresholds.yaml` for alternate
 cards. JSON input supports multiple hole groups, each with diameter, depth and count.
 The worksheet currently accepts one group of identical holes.
+For STEP turning use `--axis X`, `Y` or `Z`; for sheet metal add `--flat-blank` only
+when the file is the developed blank. The JSON file still supplies process, grade,
+quantity and all manufacturing features.
 
 Rate-card validation rejects negative rates and invalid utilisation/yield fractions.
 Mark a card `quoted` only after recording a real source and an ISO quote date.
@@ -84,12 +133,14 @@ Local verification used Windows and Python 3.13; the remote workflow has not run
 
 ## Before using an estimate for sourcing
 
-Replace placeholder material, machine, finishing and tooling rates with dated vendor data.
+Confirm the material budget prices and replace machine, finishing and tooling placeholders
+with dated vendor data.
 Review DFM thresholds with a machinist or foundry engineer. Confirm stock form, fixture
 count, production yield and any post-machining that this simple model excludes. Casting
 and machining estimates describe different process plans even when their envelopes match.
 
-The app has no account system, database or upload service. Estimates live in the current
+The app has no account system or database. STEP files are uploaded to the running app
+server for processing. Estimates live in the current
 Streamlit session; download the audit JSON if you need a permanent record. Generated
 reports, the supplied planning brief and local development/design guides are ignored by
 Git. The project README, source, configuration, examples and tests are tracked.

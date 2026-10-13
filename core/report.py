@@ -8,6 +8,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
     KeepTogether,
+    PageBreak,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
@@ -38,6 +39,8 @@ def build_report(
     styles = getSampleStyleSheet()
     styles["BodyText"].fontSize = 8.5
     styles["BodyText"].leading = 11
+    for heading in ("Heading1", "Heading2", "Heading3"):
+        styles[heading].keepWithNext = True
     story = []
 
     def paragraph(text, style="BodyText"):
@@ -108,6 +111,7 @@ def build_report(
     for assumption in result.assumptions:
         story.append(paragraph(assumption))
     story += [
+        PageBreak(),
         paragraph("Rate basis", "Heading2"),
         paragraph(f"Source: {result.rate_source}; date: {result.rate_date}."),
         paragraph("All rate values below use the units in config/rates.yaml."),
@@ -136,11 +140,13 @@ def build_report(
                 yield [name, ", ".join(map(str, value)) if isinstance(value, list) else str(value)]
 
     story.append(table([["Rate", "Value"], *flattened(selected_rates)]))
+    story.append(PageBreak())
     story.append(paragraph("Input snapshot", "Heading2"))
     snapshot = part.model_dump(mode="json")
     snapshot["resolved_volume_cm3"] = part.net_volume_cm3
     snapshot["resolved_area_cm2"] = part.area_cm2
     story.append(table([["Input", "Value"], *flattened(snapshot)]))
+    story.append(PageBreak())
     story.append(paragraph("Screening threshold snapshot", "Heading2"))
     story.append(table([["Threshold", "Value"], *flattened(thresholds.model_dump(mode="json"))]))
 

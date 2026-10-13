@@ -116,6 +116,7 @@ def _measure_solid(path: Path) -> dict:
     from OCP.GProp import GProp_GProps
     from OCP.IFSelect import IFSelect_RetDone
     from OCP.STEPControl import STEPControl_Reader
+    from OCP.TColStd import TColStd_SequenceOfAsciiString
     from OCP.TopAbs import TopAbs_COMPOUND, TopAbs_SOLID
     from OCP.TopoDS import TopoDS_Iterator
 
@@ -125,6 +126,16 @@ def _measure_solid(path: Path) -> dict:
     if reader.NbRootsForTransfer() != 1:
         raise StepImportError(
             "Import one solid part at a time; multi-part assemblies are unsupported."
+        )
+    length_units, angle_units, solid_angle_units = (
+        TColStd_SequenceOfAsciiString(),
+        TColStd_SequenceOfAsciiString(),
+        TColStd_SequenceOfAsciiString(),
+    )
+    reader.FileUnits(length_units, angle_units, solid_angle_units)
+    if length_units.IsEmpty():
+        raise StepImportError(
+            "STEP length units are missing. Export with declared mm or inch units."
         )
     reader.SetSystemLengthUnit(1.0)
     if reader.TransferRoots() != 1:
@@ -164,6 +175,9 @@ def _measure_solid(path: Path) -> dict:
         "bounding_box_mm": (xmax - xmin, ymax - ymin, zmax - zmin),
         "volume_cm3": volume.Mass() / 1000,
         "surface_area_cm2": area.Mass() / 100,
+        "source_length_units": [
+            length_units.Value(i).ToCString() for i in range(1, length_units.Length() + 1)
+        ],
     }
 
 

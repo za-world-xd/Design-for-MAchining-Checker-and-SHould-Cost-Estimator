@@ -27,3 +27,25 @@ def test_cli_invalid_json_has_readable_error(tmp_path, capsys):
         main([str(invalid)])
     assert error.value.code == 2
     assert "Could not estimate part" in capsys.readouterr().err
+
+
+def test_cli_step_preserves_source_and_replaces_geometry(capsys):
+    assert (
+        main(
+            [
+                str(ROOT / "examples/milled_bracket.json"),
+                "--step",
+                str(ROOT / "examples/step_block.step"),
+            ]
+        )
+        == 0
+    )
+    data = json.loads(capsys.readouterr().out)
+    part = data["estimate"]["part"]
+    assert part["volume_cm3"] == 120
+    assert part["surface_area_cm2"] == 184
+    assert part["geometry_import"]["file_name"] == "step_block.step"
+    assert (
+        data["rates"]["materials"]["aluminium_6061"]["price_reference"]["checked_on"]
+        == "2026-11-05"
+    )

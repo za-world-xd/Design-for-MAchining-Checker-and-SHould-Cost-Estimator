@@ -1,3 +1,4 @@
+import hashlib
 import json
 
 import pandas as pd
@@ -11,6 +12,7 @@ from core.dfm_rules import check_dfm, load_thresholds
 from core.estimator import batch_sensitivity, estimate, with_changes
 from core.models import Hole, Part, Process
 from core.report import build_report
+from core.step_reader import StepImportError, geometry_defaults, read_step, step_available
 
 st.set_page_config(page_title="DFM cost worksheet", layout="wide")
 st.html("""
@@ -24,7 +26,8 @@ st.html("""
   }
   :focus-visible { outline: 3px solid #24603e !important; outline-offset: 3px; }
   [data-testid="stMetricValue"] { font-variant-numeric: tabular-nums; }
-  .stCaption, [data-testid="stCaptionContainer"] { color: #4b584f; }
+  .stCaption, .stCaption *, [data-testid="stCaptionContainer"],
+  [data-testid="stCaptionContainer"] * { color: #4b584f !important; }
   @media (max-width: 640px) {
     .stMainBlockContainer { padding: 2rem 1rem; }
     h1 { font-size: 1.8rem; }
@@ -74,7 +77,93 @@ material = st.selectbox(
     format_func=lambda key: rates.materials[key].label,
     key=f"material_{starting_point}_{process.value}",
 )
-context = (starting_point, process.value, material)
+selected_material = rates.materials[material]
+price_reference = selected_material.price_reference
+st.caption(f"Material budget rate: ₹{selected_material.price_kg:,.2f}/kg.")
+if price_reference:
+    st.caption(
+        f"[Supplier listing]({price_reference.url}), {price_reference.supplier}. "
+        f"Checked {price_reference.checked_on}. {price_reference.note}"
+    )
+upload_id, step_geometry, spindle_axis, flat_blank = None, None, "Z", False
+with st.expander("Import a STEP solid"):
+    st.caption(
+        "Read one closed solid from a .step or .stp file, up to 20 MiB. "
+        "File units are converted to mm. Holes, walls, tolerances and finish remain manual."
+    )
+    uploaded = st.file_uploader("STEP part", type=["step", "stp"], key="step_file")
+    if uploaded is not None:
+        upload_data = uploaded.getvalue()
+        upload_id = uploaded.name + ":" + hashlib.sha256(upload_data).hexdigest()
+    if st.session_state.get("step_upload_id") != upload_id:
+        st.session_state.pop("step_geometry", None)
+        st.session_state.pop("step_error", None)
+        st.session_state.pop("result", None)
+        st.session_state["step_upload_id"] = upload_id
+    if uploaded is not None and process == Process.TURNING:
+        spindle_axis = st.selectbox("STEP spindle axis", ["X", "Y", "Z"], index=2)
+        st.caption(
+            "Length follows the chosen axis. The initial stock diameter is the diagonal "
+            "of the transverse bounding box, a conservative envelope. Review the actual diameter."
+        )
+    if uploaded is not None and process == Process.SHEET:
+        flat_blank = st.checkbox("This STEP represents a developed flat blank")
+        st.caption(
+            "Folded sheet parts are not unfolded. Export a flat blank with thickness along Z."
+        )
+    if uploaded is not None:
+        available = step_available()
+        if not available:
+            st.warning("Install this project's requirements.txt to enable the CAD reader.")
+        if st.button(
+            "Read and fill geometry",
+            key="read_step",
+            disabled=not available or (process == Process.SHEET and not flat_blank),
+        ):
+            st.session_state.pop("result", None)
+            st.session_state.pop("step_geometry", None)
+            st.session_state.pop("step_error", None)
+            try:
+                with st.spinner("Reading STEP solid, up to 30 seconds..."):
+                    st.session_state["step_geometry"] = read_step(upload_data, uploaded.name)
+                    st.session_state["step_generation"] = (
+                        st.session_state.get("step_generation", 0) + 1
+                    )
+            except StepImportError as exc:
+                st.session_state["step_error"] = str(exc)
+    if st.session_state.get("step_error"):
+        st.error(st.session_state["step_error"])
+    step_geometry = st.session_state.get("step_geometry")
+    if step_geometry:
+        x, y, z = step_geometry.bounding_box_mm
+        st.success(
+            f"Read {step_geometry.file_name}. Review the geometry fields before calculating."
+        )
+        st.write(
+            f"Global XYZ bounds: {x:.4f} × {y:.4f} × {z:.4f} mm. "
+            f"Volume: {step_geometry.volume_cm3:.4f} cm³. "
+            f"Surface area: {step_geometry.surface_area_cm2:.4f} cm²."
+        )
+        st.caption("Declared file units: " + ", ".join(step_geometry.source_length_units))
+
+import_defaults = None
+if step_geometry and (process != Process.SHEET or flat_blank):
+    try:
+        import_defaults = geometry_defaults(step_geometry, process, spindle_axis, flat_blank)
+    except StepImportError as exc:
+        st.error(str(exc))
+if import_defaults:
+    st.caption(f"Geometry seeded from {step_geometry.file_name}. Every dimension remains editable.")
+context = (
+    starting_point,
+    process.value,
+    material,
+    upload_id,
+    bool(import_defaults),
+    spindle_axis,
+    flat_blank,
+    st.session_state.get("step_generation", 0),
+)
 stored_result = st.session_state.get("result")
 if st.session_state.get("context") != context or (stored_result and len(stored_result) != 6):
     st.session_state.pop("result", None)
@@ -84,10 +173,11 @@ st.caption(
     "Changing example, process or material clears the previous result. "
     "Form edits take effect when you calculate again."
 )
-form_key = f"part_{starting_point}_{process.value}_{material}"
+form_key = "part_" + hashlib.sha256(repr(context).encode()).hexdigest()[:16]
+defaults = sample.model_dump() | (import_defaults or {})
 with st.form(form_key):
     st.subheader("Part and envelope")
-    name = st.text_input("Part name", value=sample.name, max_chars=100)
+    name = st.text_input("Part name", value=defaults["name"], max_chars=100)
     qty = st.number_input(
         "Batch quantity", min_value=1, max_value=10000000, value=sample.quantity, step=1
     )
@@ -97,32 +187,34 @@ with st.form(form_key):
         st.caption("Width is the outside diameter of the cylindrical envelope.")
     cols = st.columns(3)
     length = cols[0].number_input(
-        "Length (mm)", min_value=0.01, max_value=10000.0, value=sample.length_mm
+        "Length (mm)", min_value=0.01, max_value=10000.0, value=defaults["length_mm"]
     )
     width = cols[1].number_input(
         "Diameter (mm)" if process == Process.TURNING else "Width (mm)",
         min_value=0.01,
         max_value=10000.0,
-        value=sample.width_mm,
+        value=defaults["width_mm"],
     )
     height = cols[2].number_input(
         "Thickness (mm)" if process == Process.SHEET else "Height (mm)",
         min_value=0.01,
         max_value=10000.0,
-        value=2.0 if process == Process.SHEET else sample.height_mm,
+        value=2.0 if process == Process.SHEET and not import_defaults else defaults["height_mm"],
         disabled=process == Process.TURNING,
     )
     cols = st.columns(2)
     volume = cols[0].number_input(
         "Finished volume (cm³; 0 uses envelope)",
         min_value=0.0,
-        value=(sample.volume_cm3 or 0.0) if process == sample.process else 0.0,
+        value=(defaults["volume_cm3"] or 0.0)
+        if import_defaults or process == sample.process
+        else 0.0,
         help="Measured solid volume overrides the bounding envelope volume.",
     )
     area = cols[1].number_input(
         "Surface area (cm²; 0 uses envelope)",
         min_value=0.0,
-        value=0.0,
+        value=defaults["surface_area_cm2"] or 0.0,
         help="Use measured area for finishing charges when available.",
     )
     st.subheader("Features and DFM inputs")
@@ -230,6 +322,8 @@ if submitted:
             secondary=secondary,
             overhead_pct=overhead,
             margin_pct=margin,
+            geometry_import=step_geometry if import_defaults else None,
+            turning_axis=spindle_axis if import_defaults and process == Process.TURNING else None,
         )
         with st.spinner("Calculating cost and screening geometry..."):
             result = estimate(part, rates)
@@ -311,8 +405,9 @@ with st.expander("Assumptions and rate basis"):
     st.write(f"Rate source: {result.rate_source}. Date: {result.rate_date}.")
     st.json(saved_rates.model_dump(mode="json", by_alias=True), expanded=False)
     st.caption(
-        "STEP import and automatic feature recognition are not implemented. "
-        "Use measured geometry in the form. No files are uploaded to a remote service."
+        "STEP import measures bounds, solid volume and surface area only. "
+        "Features are entered manually. Files are processed on the app server; "
+        "no external CAD service is used."
     )
 
 st.subheader("Compare an alternative")

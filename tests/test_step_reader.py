@@ -38,6 +38,7 @@ def test_box_measurements_and_provenance(box_step):
     assert geometry.volume_cm3 == pytest.approx(120)
     assert geometry.surface_area_cm2 == pytest.approx(184)
     assert len(geometry.sha256) == 64
+    assert geometry.source_length_units
     part = Part(**geometry_defaults(geometry, Process.MILLING))
     assert part.net_volume_cm3 == pytest.approx(120)
     assert part.geometry_import.file_name == "bracket.STEP"
@@ -48,6 +49,7 @@ def test_declared_inch_units_are_converted_to_mm(tmp_path):
     assert b"CONVERSION_BASED_UNIT" in data
     geometry = read_step(data, "inch.stp")
     assert geometry.bounding_box_mm == pytest.approx((25.4, 50.8, 12.7))
+    assert any("inch" in unit.lower() for unit in geometry.source_length_units)
     assert geometry.volume_cm3 == pytest.approx(25.4 * 50.8 * 12.7 / 1000)
 
 

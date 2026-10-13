@@ -8,6 +8,7 @@ from core.dfm_rules import check_dfm, load_thresholds
 from core.estimator import estimate
 from core.models import Part
 from core.report import build_report
+from core.step_reader import MAX_STEP_BYTES, geometry_defaults, read_step
 
 
 def main(argv=None) -> int:
@@ -18,9 +19,21 @@ def main(argv=None) -> int:
     parser.add_argument("--rates", type=Path, help="Override the YAML rate card")
     parser.add_argument("--thresholds", type=Path, help="Override YAML screening thresholds")
     parser.add_argument("--pdf", type=Path, help="Write a PDF report to this path")
+    parser.add_argument("--step", type=Path, help="Seed geometry from a single-solid STEP file")
+    parser.add_argument("--axis", choices=["X", "Y", "Z"], default="Z", help="STEP turning axis")
+    parser.add_argument(
+        "--flat-blank", action="store_true", help="Confirm STEP is a flat sheet blank"
+    )
     args = parser.parse_args(argv)
     try:
         part = Part.model_validate_json(args.part.read_text(encoding="utf-8"))
+        if args.step:
+            with args.step.open("rb") as stream:
+                geometry = read_step(stream.read(MAX_STEP_BYTES + 1), args.step.name)
+            part = Part.model_validate(
+                part.model_dump()
+                | geometry_defaults(geometry, part.process, args.axis, args.flat_blank)
+            )
         rates = load_rates(args.rates)
         thresholds = load_thresholds(args.thresholds)
         result = estimate(part, rates)

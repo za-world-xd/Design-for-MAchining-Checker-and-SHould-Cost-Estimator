@@ -31,6 +31,9 @@ class StepGeometry(BaseModel):
     ]
     volume_cm3: float = Field(gt=0)
     surface_area_cm2: float = Field(gt=0)
+    source_length_units: tuple[Annotated[str, Field(min_length=1, max_length=40)], ...] = Field(
+        default=(), max_length=8
+    )
 
 
 class Part(BaseModel):
