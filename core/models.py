@@ -36,6 +36,15 @@ class StepGeometry(BaseModel):
     )
 
 
+class PresetSource(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    key: str
+    label: str
+    version: int = 1
+    parameters: dict[str, float]
+    assumptions: list[str]
+
+
 class Part(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
     name: str = Field(default="Machined bracket", min_length=1, max_length=100)
@@ -68,6 +77,7 @@ class Part(BaseModel):
     margin_pct: float = Field(default=10, ge=0, le=100)
     geometry_import: StepGeometry | None = None
     turning_axis: Literal["X", "Y", "Z"] | None = None
+    preset_source: PresetSource | None = None
 
     @property
     def envelope_cm3(self) -> float:

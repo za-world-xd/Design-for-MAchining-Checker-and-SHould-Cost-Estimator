@@ -30,6 +30,12 @@ def assemble(part, rates, direct, mass_kg, cycle_min, assumptions) -> Estimate:
     direct["Inspection"] = rates.inspection.minutes_per_part / 60 * rates.inspection.hour_rate
     direct["Overhead"] = sum(direct.values()) * part.overhead_pct / 100
     direct["Margin (markup)"] = sum(direct.values()) * part.margin_pct / 100
+    if part.preset_source:
+        assumptions += [f"Parametric preset: {part.preset_source.label}, nominal geometry."]
+        assumptions += part.preset_source.assumptions
+        assumptions += [
+            "Threads, purchased-part discounts and process optimisation are not inferred."
+        ]
     if part.geometry_import:
         assumptions += [
             f"STEP source: {part.geometry_import.file_name}; review any edited dimensions.",
