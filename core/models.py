@@ -1,5 +1,6 @@
 from enum import Enum
 from math import pi
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -17,6 +18,19 @@ class Hole(BaseModel):
     diameter_mm: float = Field(gt=0)
     depth_mm: float = Field(gt=0)
     count: int = Field(default=1, ge=1, le=10000)
+
+
+class StepGeometry(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False, frozen=True)
+    file_name: str = Field(min_length=1, max_length=255)
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    bounding_box_mm: tuple[
+        Annotated[float, Field(ge=0.01, le=10000)],
+        Annotated[float, Field(ge=0.01, le=10000)],
+        Annotated[float, Field(ge=0.01, le=10000)],
+    ]
+    volume_cm3: float = Field(gt=0)
+    surface_area_cm2: float = Field(gt=0)
 
 
 class Part(BaseModel):
@@ -49,6 +63,8 @@ class Part(BaseModel):
     secondary: list[str] = Field(default_factory=list, max_length=4)
     overhead_pct: float = Field(default=15, ge=0, le=100)
     margin_pct: float = Field(default=10, ge=0, le=100)
+    geometry_import: StepGeometry | None = None
+    turning_axis: Literal["X", "Y", "Z"] | None = None
 
     @property
     def envelope_cm3(self) -> float:
