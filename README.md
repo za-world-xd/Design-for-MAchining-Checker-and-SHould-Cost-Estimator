@@ -61,7 +61,10 @@ Three illustrative parts in `examples/` have independent component calculations 
 The milling example uses 138 cm3 stock, 78 cm3 removal and a 5.68 minute cycle.
 The turning example uses cylindrical stock of 36.1283155 cm3. The sheet example
 uses a 12 cm3 blank, 75% nesting utilisation, 320 mm cut and two bends.
-Vendor quote validation is pending. No accuracy claim is made against real quotes.
+Vendor quote validation is pending. To calibrate this model, collect two or three shop
+quotes for the same drawing revision, material, batch, tolerance and finish. Record the
+quote date, location, tax basis and included operations. Compare the direct costs before
+changing overhead or markup. No accuracy claim is made against real quotes.
 
 ## Command line
 
@@ -78,3 +81,18 @@ Rate-card validation rejects negative rates and invalid utilisation/yield fracti
 Mark a card `quoted` only after recording a real source and an ISO quote date.
 GitHub Actions is configured to run lint and tests on Python 3.11 and 3.13 after pushing.
 Local verification used Windows and Python 3.13; the remote workflow has not run yet.
+
+## Before using an estimate for sourcing
+
+Replace placeholder material, machine, finishing and tooling rates with dated vendor data.
+Review DFM thresholds with a machinist or foundry engineer. Confirm stock form, fixture
+count, production yield and any post-machining that this simple model excludes. Casting
+and machining estimates describe different process plans even when their envelopes match.
+
+The app has no account system, database or upload service. Estimates live in the current
+Streamlit session; download the audit JSON if you need a permanent record. Generated
+reports, the supplied planning brief and local development/design guides are ignored by
+Git. The project README, source, configuration, examples and tests are tracked.
+
+For Streamlit Community Cloud, use `app.py` as the entry point and `requirements.txt`
+for dependencies. A GitHub remote and hosting account are needed to publish the app.

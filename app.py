@@ -18,8 +18,13 @@ st.html("""
   .stMainBlockContainer { max-width: 1200px; }
   button, a[href], select, summary, [role="combobox"], label { cursor: pointer; }
   button:disabled { cursor: not-allowed; }
+  button { min-height: 44px; min-width: 44px; }
+  [role="combobox"], [data-testid="stNumberInput"] input {
+    min-height: 44px;
+  }
   :focus-visible { outline: 3px solid #24603e !important; outline-offset: 3px; }
   [data-testid="stMetricValue"] { font-variant-numeric: tabular-nums; }
+  .stCaption, [data-testid="stCaptionContainer"] { color: #4b584f; }
   @media (max-width: 640px) {
     .stMainBlockContainer { padding: 2rem 1rem; }
     h1 { font-size: 1.8rem; }
@@ -343,7 +348,15 @@ try:
     )
     comparison["Submitted (INR)"] = comparison["Component"].map(result.costs).fillna(0)
     comparison["Alternative (INR)"] = comparison["Component"].map(alternative.costs).fillna(0)
-    st.dataframe(comparison, hide_index=True, width="stretch")
+    st.dataframe(
+        comparison,
+        hide_index=True,
+        width="stretch",
+        column_config={
+            "Submitted (INR)": st.column_config.NumberColumn(format="%.2f"),
+            "Alternative (INR)": st.column_config.NumberColumn(format="%.2f"),
+        },
+    )
     delta = alternative.unit_cost - result.unit_cost
     st.write(
         f"Submitted ₹{result.unit_cost:,.2f}/unit; alternative ₹{alternative.unit_cost:,.2f}/unit. "
