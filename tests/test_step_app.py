@@ -1,6 +1,5 @@
-from streamlit.testing.v1 import AppTest
-
 from core.config import ROOT
+from tests.ui_helpers import custom_app
 
 
 def button(app, label):
@@ -12,7 +11,7 @@ def select(app, label):
 
 
 def test_uploaded_step_fills_geometry_and_export_provenance():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=45).run()
+    app = custom_app(45)
     data = (ROOT / "examples/step_block.step").read_bytes()
     app.file_uploader[0].set_value(("block.step", data, "application/step")).run()
     button(app, "Read and fill geometry").click().run()
@@ -39,7 +38,7 @@ def test_uploaded_step_fills_geometry_and_export_provenance():
 
 
 def test_replacing_import_with_bad_file_cannot_reuse_old_geometry():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=45).run()
+    app = custom_app(45)
     data = (ROOT / "examples/step_block.step").read_bytes()
     app.file_uploader[0].set_value(("block.step", data, "application/step")).run()
     button(app, "Read and fill geometry").click().run()
@@ -56,7 +55,7 @@ def test_replacing_import_with_bad_file_cannot_reuse_old_geometry():
 
 
 def test_sheet_requires_confirmation_and_turning_axis_is_editable():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=45).run()
+    app = custom_app(45)
     data = (ROOT / "examples/step_block.step").read_bytes()
     select(app, "Manufacturing process").select("Sheet metal").run()
     app.file_uploader[0].set_value(("flat.step", data, "application/step")).run()

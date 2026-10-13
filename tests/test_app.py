@@ -1,6 +1,4 @@
-from streamlit.testing.v1 import AppTest
-
-from core.config import ROOT
+from tests.ui_helpers import custom_app
 
 
 def number(app, label):
@@ -12,7 +10,7 @@ def select(app, label):
 
 
 def test_form_empty_calculate_error_and_result_reset():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=30).run()
+    app = custom_app()
     assert not app.exception
     assert "Enter a part above" in app.info[0].value
     app.button[0].click().run()
@@ -33,7 +31,7 @@ def test_form_empty_calculate_error_and_result_reset():
 
 
 def test_sheet_and_casting_and_alternative_processes():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=30).run()
+    app = custom_app()
     select(app, "Starting example").select("Sheet bracket").run()
     app.button[0].click().run()
     assert not app.exception
@@ -51,7 +49,7 @@ def test_sheet_and_casting_and_alternative_processes():
 
 
 def test_all_milling_inputs_are_submitted_and_stale_results_are_labelled():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=30).run()
+    app = custom_app()
     app.text_input[0].set_value("Fixture housing")
     changes = {
         "Batch quantity": 25,
@@ -92,7 +90,7 @@ def test_all_milling_inputs_are_submitted_and_stale_results_are_labelled():
 
 
 def test_zero_measured_clearances_and_turning_support():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=30).run()
+    app = custom_app()
     select(app, "Starting example").select("Sheet bracket").run()
     app.checkbox[0].check()
     number(app, "Thickness (mm)").set_value(3.0)
@@ -112,7 +110,7 @@ def test_zero_measured_clearances_and_turning_support():
 
 
 def test_material_and_alternative_geometry_validation():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=30).run()
+    app = custom_app()
     number(app, "Width (mm)").set_value(10.0)
     number(app, "Finished volume (cm³; 0 uses envelope)").set_value(10.0)
     app.button[0].click().run()
@@ -128,7 +126,7 @@ def test_material_and_alternative_geometry_validation():
 
 
 def test_casting_features_reach_screening_and_report():
-    app = AppTest.from_file(ROOT / "app.py", default_timeout=30).run()
+    app = custom_app()
     select(app, "Manufacturing process").select("Sand casting").run()
     number(app, "Maximum wall (mm)").set_value(9.0)
     number(app, "Draft angle (degrees)").set_value(0.0)

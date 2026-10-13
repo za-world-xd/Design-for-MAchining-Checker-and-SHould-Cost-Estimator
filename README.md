@@ -41,6 +41,30 @@ They use INR text so the currency renders with standard PDF fonts.
 
 ## Workflow
 
+The worksheet opens with **Common part presets**. Choose a part, change its basic
+dimensions, material and batch quantity. Geometry, DFM screening, should-cost and
+exports update when you press Enter or leave a field. Invalid geometry clears the
+estimate and downloads until corrected. The schematic follows the current dimensions;
+it is a plan/section aid, not a production drawing or generated CAD model.
+
+The 13 templates cover spacers/bushes, plain and stepped shafts, machined rings,
+drilled circular flanges, four-hole mounting plates, solid and pocketed blocks,
+flat panels, L-brackets, U-channels, sand-cast housings and die-cast trays.
+These are common engineering shapes, with no claim about market popularity or
+compliance with a particular dimensional standard. Standard stamped washers should
+be priced from a catalogue rather than treated as custom turned rings.
+
+Volume, exposed area, stock envelope, holes, pocket features and bend count are
+derived from the preset dimensions. **Finish and costing assumptions** exposes
+secondary operations, tolerance, finish, overhead and markup. Bent-sheet presets
+use outside leg dimensions, 90-degree bends and an editable K-factor to calculate
+the developed blank using [bend deduction](https://help.solidworks.com/2022/english/SolidWorks/sldworks/c_Bend_Allowance_and_Bend_Deduction.htm).
+Calibrate it to the material and tooling. Cast templates omit draft and fillets
+from nominal geometry; post-machining, ribs, bosses and other excluded features
+are stated in each template. PDF and audit JSON record the template version,
+input dimensions and assumptions alongside the derived geometry.
+
+For a different shape or a STEP file, choose **Custom / STEP**.
 Choose a starting example, process and material, edit the part form, then calculate.
 Inspect the cost table, DFM findings and batch-size chart. PDF, cost CSV and audit JSON
 downloads refer to the last submitted snapshot. Form edits need a new calculation.
@@ -50,7 +74,7 @@ Unsupported material, geometry and finishing combinations show a validation mess
 
 ## STEP import
 
-Open **Import a STEP solid**, choose a `.step` or `.stp` file, then click
+In **Custom / STEP**, open **Import a STEP solid**, choose a `.step` or `.stp` file, then click
 **Read and fill geometry**. Review the filled fields and calculate the estimate.
 `examples/step_block.step` is a generated 100 x 60 x 20 mm solid for trying the importer.
 

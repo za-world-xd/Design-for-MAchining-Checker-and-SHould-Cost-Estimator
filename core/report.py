@@ -4,7 +4,7 @@ from xml.sax.saxutils import escape
 from zoneinfo import ZoneInfo
 
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
     KeepTogether,
@@ -39,6 +39,7 @@ def build_report(
     styles = getSampleStyleSheet()
     styles["BodyText"].fontSize = 8.5
     styles["BodyText"].leading = 11
+    styles.add(ParagraphStyle("Snapshot", parent=styles["BodyText"], fontSize=8, leading=10))
     for heading in ("Heading1", "Heading2", "Heading3"):
         styles[heading].keepWithNext = True
     story = []
@@ -46,8 +47,9 @@ def build_report(
     def paragraph(text, style="BodyText"):
         return Paragraph(escape(str(text)), styles[style])
 
-    def table(rows):
-        cells = [[paragraph(cell) for cell in row] for row in rows]
+    def table(rows, *, compact=False):
+        style = "Snapshot" if compact else "BodyText"
+        cells = [[paragraph(cell, style) for cell in row] for row in rows]
         item = Table(cells, colWidths=(105 * mm, 69 * mm), repeatRows=1, hAlign="LEFT")
         item.setStyle(
             TableStyle(
@@ -56,8 +58,8 @@ def build_report(
                     ("VALIGN", (0, 0), (-1, -1), "TOP"),
                     ("LINEBELOW", (0, 0), (-1, 0), 0.7, colors.HexColor("#52635a")),
                     ("LINEBELOW", (0, 1), (-1, -1), 0.25, colors.HexColor("#d4d9d5")),
-                    ("TOPPADDING", (0, 0), (-1, -1), 3),
-                    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                    ("TOPPADDING", (0, 0), (-1, -1), 2 if compact else 3),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 2 if compact else 3),
                 ]
             )
         )
@@ -145,7 +147,7 @@ def build_report(
     snapshot = part.model_dump(mode="json")
     snapshot["resolved_volume_cm3"] = part.net_volume_cm3
     snapshot["resolved_area_cm2"] = part.area_cm2
-    story.append(table([["Input", "Value"], *flattened(snapshot)]))
+    story.append(table([["Input", "Value"], *flattened(snapshot)], compact=True))
     story.append(PageBreak())
     story.append(paragraph("Screening threshold snapshot", "Heading2"))
     story.append(table([["Threshold", "Value"], *flattened(thresholds.model_dump(mode="json"))]))

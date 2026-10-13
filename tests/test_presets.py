@@ -4,8 +4,8 @@ import pytest
 from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut, BRepAlgoAPI_Fuse
 from OCP.BRepGProp import BRepGProp
 from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeCylinder
-from OCP.GProp import GProp_GProps
 from OCP.gp import gp_Ax2, gp_Dir, gp_Pnt
+from OCP.GProp import GProp_GProps
 
 from core.config import load_rates
 from core.dfm_rules import check_dfm, load_thresholds

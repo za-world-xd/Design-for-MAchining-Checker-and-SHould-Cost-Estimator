@@ -21,7 +21,7 @@ dependencies = [
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "pypdf>=5,<7", "pymupdf>=1.25,<2"]
 
 [tool.setuptools.packages.find]
-include = ["core*"]
+include = ["core*", "ui*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
