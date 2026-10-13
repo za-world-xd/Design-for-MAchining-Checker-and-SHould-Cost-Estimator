@@ -1,28 +1,28 @@
 part,component,expected_inr_per_unit
-milled_bracket,Material,125.1936
+milled_bracket,Material,156.492
 milled_bracket,Machining,85.2
 milled_bracket,Setup,25.5
 milled_bracket,Tooling,5.112
 milled_bracket,Finishing,0
 milled_bracket,Inspection,5
-milled_bracket,Overhead,36.90084
-milled_bracket,Margin (markup),28.290644
-milled_bracket,Total,311.197084
-turned_spacer,Material,32.7756078364
+milled_bracket,Overhead,41.5956
+milled_bracket,Margin (markup),31.88996
+milled_bracket,Total,350.78956
+turned_spacer,Material,40.9695097955
 turned_spacer,Machining,24.5962366372
 turned_spacer,Setup,15.5
 turned_spacer,Tooling,1.4757741982
 turned_spacer,Finishing,0
 turned_spacer,Inspection,5
-turned_spacer,Overhead,11.9021428008
-turned_spacer,Margin (markup),9.1249761473
-turned_spacer,Total,100.3747376198
-sheet_bracket,Material,13.824
+turned_spacer,Overhead,13.1312280946
+turned_spacer,Margin (markup),10.0672748726
+turned_spacer,Total,110.7400235981
+sheet_bracket,Material,17.28
 sheet_bracket,Cutting and bending,28.2222222222
 sheet_bracket,Setup,11
 sheet_bracket,Tooling,2
 sheet_bracket,Finishing,0
 sheet_bracket,Inspection,5
-sheet_bracket,Overhead,9.0069333333
-sheet_bracket,Margin (markup),6.9053155556
-sheet_bracket,Total,75.9584711111
+sheet_bracket,Overhead,9.5253333333
+sheet_bracket,Margin (markup),7.3027555556
+sheet_bracket,Total,80.3303111111

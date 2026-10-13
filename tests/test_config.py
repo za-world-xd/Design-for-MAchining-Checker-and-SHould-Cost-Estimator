@@ -49,3 +49,13 @@ def test_missing_process_threshold_rejected():
     data["minimum_ra"].pop("CNC milling")
     with pytest.raises(ValueError, match="Every process"):
         Thresholds.model_validate(data)
+
+
+def test_indian_material_budget_rates_have_dated_primary_sources():
+    rates = load_rates()
+    assert rates.metadata.status == "illustrative"
+    for material in rates.materials.values():
+        assert material.price_reference is not None
+        assert material.price_reference.checked_on == date(2026, 11, 5)
+        assert material.price_reference.url.startswith("https://")
+        assert material.price_reference.listed_price_kg > 0

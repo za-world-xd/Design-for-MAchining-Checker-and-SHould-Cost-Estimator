@@ -17,7 +17,7 @@ def test_form_empty_calculate_error_and_result_reset():
     assert "Enter a part above" in app.info[0].value
     app.button[0].click().run()
     assert not app.exception
-    assert app.metric[0].value == "₹311.20"
+    assert app.metric[0].value == "₹350.79"
     assert len(app.get("download_button")) == 3
     number(app, "Finished volume (cm³; 0 uses envelope)").set_value(99999)
     app.button[0].click().run()
@@ -37,7 +37,7 @@ def test_sheet_and_casting_and_alternative_processes():
     select(app, "Starting example").select("Sheet bracket").run()
     app.button[0].click().run()
     assert not app.exception
-    assert app.metric[0].value == "₹75.96"
+    assert app.metric[0].value == "₹80.33"
     select(app, "Alternative process").select("Die casting").run()
     assert not app.exception
     select(app, "Manufacturing process").select("Sand casting").run()

@@ -13,13 +13,13 @@ def test_milling_hand_calculation():
     part = Part(volume_cm3=60, quantity=100)
     result = estimate_milling(part, load_rates())
     # Stock = 138 cm3, removal = 78 cm3, cycle = 78/20 * 1.2 + 1 = 5.68 min.
-    assert result.costs["Material"] == pytest.approx(125.1936)
+    assert result.costs["Material"] == pytest.approx(156.492)
     assert result.cycle_min == pytest.approx(5.68)
     assert result.costs["Machining"] == pytest.approx(85.2)
     assert result.costs["Setup"] == pytest.approx(25.5)
     assert result.costs["Tooling"] == pytest.approx(5.112)
     assert result.costs["Inspection"] == 5
-    assert result.unit_cost == pytest.approx(311.197084)
+    assert result.unit_cost == pytest.approx(350.78956)
 
 
 def test_turning_uses_cylinder():

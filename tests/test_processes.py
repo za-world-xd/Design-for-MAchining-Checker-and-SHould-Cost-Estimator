@@ -11,11 +11,11 @@ def test_sheet_hand_calculation():
     part = Part(process=Process.SHEET, length_mm=100, width_mm=60, height_mm=2)
     result = estimate_sheetmetal(part, load_rates())
     # 12 cm3 blank, 0.0324 kg; 320 mm cut / 1800 + 2 s pierce = 0.21111 min.
-    assert result.costs["Material"] == pytest.approx(13.824)
+    assert result.costs["Material"] == pytest.approx(17.28)
     assert result.costs["Cutting and bending"] == pytest.approx(28.2222222222)
     assert result.costs["Setup"] == 11
     assert result.costs["Tooling"] == 2
-    assert result.unit_cost == pytest.approx(75.9584711111)
+    assert result.unit_cost == pytest.approx(80.3303111111)
 
 
 @pytest.mark.parametrize(

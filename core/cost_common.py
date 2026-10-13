@@ -30,6 +30,24 @@ def assemble(part, rates, direct, mass_kg, cycle_min, assumptions) -> Estimate:
     direct["Inspection"] = rates.inspection.minutes_per_part / 60 * rates.inspection.hour_rate
     direct["Overhead"] = sum(direct.values()) * part.overhead_pct / 100
     direct["Margin (markup)"] = sum(direct.values()) * part.margin_pct / 100
+    if part.geometry_import:
+        assumptions += [
+            f"STEP source: {part.geometry_import.file_name}; review any edited dimensions.",
+            "STEP supplies bounds, solid volume and area, not holes, walls or tolerances.",
+        ]
+        if part.process.value == "CNC turning":
+            assumptions.append(
+                f"STEP spindle axis: {part.turning_axis}; stock diameter was seeded from the "
+                "transverse bounding-box diagonal. Review the actual outside diameter."
+            )
+    price_reference = rates.materials[part.material].price_reference
+    if price_reference:
+        assumptions += [
+            f"Material budget rate INR {rates.materials[part.material].price_kg:g}/kg; "
+            f"public supplier listing checked {price_reference.checked_on}, not a firm quote.",
+            price_reference.tax_basis,
+            "Supplier minimum order is a sourcing condition, not a modelled batch purchase charge.",
+        ]
     return Estimate(
         part=part,
         costs=direct,

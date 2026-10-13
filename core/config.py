@@ -17,6 +17,18 @@ class ConfigModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class MaterialPriceReference(ConfigModel):
+    kind: Literal["public_listing_estimate"]
+    supplier: str = Field(min_length=1)
+    url: str = Field(pattern=r"^https://")
+    checked_on: date
+    listed_price_kg: Positive
+    minimum_order_kg: Positive | None = None
+    stock_form: str
+    tax_basis: str
+    note: str
+
+
 class Material(ConfigModel):
     label: str
     density_kg_cm3: Positive
@@ -24,6 +36,7 @@ class Material(ConfigModel):
     mrr_cm3_min: Positive
     min_wall_mm: Positive
     processes: list[Process]
+    price_reference: MaterialPriceReference | None = None
 
 
 class Machine(ConfigModel):

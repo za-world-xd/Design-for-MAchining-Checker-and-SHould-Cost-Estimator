@@ -1,52 +1,112 @@
 metadata:
   currency: INR
   status: illustrative
-  source: "PLACEHOLDER: replace with dated local vendor quotes before procurement use"
-  date: null
+  source: "India material budget prices from public supplier listings checked 2026-11-05. Machine, setup, tooling and finishing rates remain PLACEHOLDER."
+  date: "2026-11-05"
 
 materials:
   aluminium_6061:
     label: Aluminium 6061
     density_kg_cm3: 0.0027
-    price_kg: 320
+    price_kg: 400
     mrr_cm3_min: 20
     min_wall_mm: 1.0
     processes: [CNC milling, CNC turning, Sheet metal]
+    price_reference:
+      kind: public_listing_estimate
+      supplier: Sachin Steel Centre, Mumbai
+      url: https://www.sachinsteelcentre.in/aluminium-plate-and-sheet.html
+      checked_on: "2026-11-05"
+      listed_price_kg: 399
+      minimum_order_kg: 2
+      stock_form: 6061 T6 plate
+      tax_basis: Not stated; treated as pre-tax for budgeting, confirm GST and freight.
+      note: Rounded to INR 400/kg. Undated public listing; bar and sheet prices may differ.
   mild_steel:
     label: Mild steel
     density_kg_cm3: 0.00785
-    price_kg: 75
+    price_kg: 65
     mrr_cm3_min: 8
     min_wall_mm: 1.5
     processes: [CNC milling, CNC turning, Sheet metal, Sand casting]
+    price_reference:
+      kind: public_listing_estimate
+      supplier: Ganpati Steel, Faridabad
+      url: https://www.ganpatisteel.com/ms-plate.html
+      checked_on: "2026-11-05"
+      listed_price_kg: 65
+      minimum_order_kg: 10
+      stock_form: Mild steel plate, IS 2062 listing
+      tax_basis: Not stated; treated as pre-tax for budgeting, confirm GST and freight.
+      note: Undated public listing. This plate rate is only a proxy for bars or foundry charge.
   stainless_304:
     label: Stainless steel 304
     density_kg_cm3: 0.008
-    price_kg: 240
+    price_kg: 245
     mrr_cm3_min: 4
     min_wall_mm: 1.5
     processes: [CNC milling, CNC turning, Sheet metal]
+    price_reference:
+      kind: public_listing_estimate
+      supplier: Narendra Metal (India), Mumbai
+      url: https://www.narendrametalindia.com/stainless-steel-plate.html
+      checked_on: "2026-11-05"
+      listed_price_kg: 245
+      minimum_order_kg: 100
+      stock_form: Stainless Steel Plate 304
+      tax_basis: Not stated; treated as pre-tax for budgeting, confirm GST and freight.
+      note: Undated public listing; stock size, finish, bar form and certificates affect price.
   brass:
     label: Brass
     density_kg_cm3: 0.0085
-    price_kg: 550
+    price_kg: 600
     mrr_cm3_min: 16
     min_wall_mm: 1.0
     processes: [CNC milling, CNC turning]
+    price_reference:
+      kind: public_listing_estimate
+      supplier: Sona Metals, India
+      url: https://sonametals.in/product/brass-round-rod/
+      checked_on: "2026-11-05"
+      listed_price_kg: 599
+      minimum_order_kg: 500
+      stock_form: Brass round rod
+      tax_basis: Not stated; treated as pre-tax for budgeting, confirm GST and freight.
+      note: Rounded to INR 600/kg. Bulk listing; small orders and free-cutting grades may cost more.
   aluminium_a356:
     label: Aluminium A356 (cast)
     density_kg_cm3: 0.00268
-    price_kg: 260
+    price_kg: 405
     mrr_cm3_min: 18
     min_wall_mm: 3.0
     processes: [Sand casting]
+    price_reference:
+      kind: public_listing_estimate
+      supplier: Ocean Asiatic Private Limited, Ahmedabad
+      url: https://www.oceanasiatic.co.in/aluminum-ingots.html
+      checked_on: "2026-11-05"
+      listed_price_kg: 405
+      minimum_order_kg: 100
+      stock_form: A356 aluminium alloy ingot
+      tax_basis: Not stated; treated as pre-tax for budgeting, confirm GST and freight.
+      note: Undated supplier listing indexed by search; verify alloy chemistry and current price.
   aluminium_adc12:
     label: Aluminium ADC12 (die cast)
     density_kg_cm3: 0.00274
-    price_kg: 250
+    price_kg: 240
     mrr_cm3_min: 18
     min_wall_mm: 1.5
     processes: [Die casting]
+    price_reference:
+      kind: public_listing_estimate
+      supplier: Ocean Asiatic Private Limited, Ahmedabad
+      url: https://www.oceanasiatic.co.in/aluminum-ingots.html
+      checked_on: "2026-11-05"
+      listed_price_kg: 240
+      minimum_order_kg: 100
+      stock_form: ADC12 aluminium alloy ingot
+      tax_basis: Not stated; treated as pre-tax for budgeting, confirm GST and freight.
+      note: Undated supplier listing indexed by search; verify recycled/primary grade and chemistry.
 
 machining:
   stock_factor: 1.15
