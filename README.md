@@ -12,7 +12,7 @@ python -m venv .venv
 
 The Streamlit worksheet supports milling, turning, sheet metal, sand casting and die casting.
 Material prices in `config/rates.yaml` are Indian public-listing budget estimates,
-checked on 5 November 2026. Machine and finishing rates remain illustrative.
+checked on November 2026. Machine and finishing rates remain illustrative.
 These are not vendor quotes. Dimensions use mm,
 volume uses cm3, mass uses kg, and all costs use INR.
 
